@@ -3,13 +3,19 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Menu() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+    }
+  }, [isAuthenticated, navigate]);
+
   if (!isAuthenticated) {
-    navigate("/auth");
     return null;
   }
 
