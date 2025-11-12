@@ -110,12 +110,16 @@ export default function Dashboard() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate("/menu-management")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow"
               >
-                <Settings className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-semibold mb-2">Menu Management</h3>
-                <p className="text-sm text-muted-foreground">Update menu items and availability</p>
+                <button
+                  onClick={() => navigate("/menu-management")}
+                  className="w-full h-full text-left cursor-pointer"
+                >
+                  <Settings className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">Menu Management</h3>
+                  <p className="text-sm text-muted-foreground">Update menu items and availability</p>
+                </button>
               </motion.div>
             </>
           ) : (
