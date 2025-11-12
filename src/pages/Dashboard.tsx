@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom"; // Changed from "react-router" to "react-router-dom"
 import { LogOut, Coffee, Users, Settings } from "lucide-react";
 import { useEffect } from "react";
 
@@ -14,6 +14,15 @@ export default function Dashboard() {
       navigate("/auth");
     }
   }, [isLoading, isAuthenticated, navigate]);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -28,10 +37,10 @@ export default function Dashboard() {
     );
   }
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/");
-  };
+  // Early return if not authenticated after loading
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -48,7 +57,7 @@ export default function Dashboard() {
           transition={{ delay: 0.1 }}
           className="flex items-center gap-2"
         >
-          <img src="./logo.svg" alt="Zwigatoo" width={40} height={40} className="rounded-lg" />
+          <img src="/logo.svg" alt="Zwigatoo" width={40} height={40} className="rounded-lg" />
           <span className="font-bold text-lg">Zwigatoo</span>
         </motion.div>
         <motion.div
@@ -58,7 +67,7 @@ export default function Dashboard() {
           className="flex items-center gap-4"
         >
           <span className="text-sm text-muted-foreground">
-            {user?.email || 'Guest User'} • {user?.role}
+            {user?.email || 'Guest User'} • {user?.role || 'customer'}
           </span>
           <Button onClick={handleSignOut} variant="outline" size="sm">
             <LogOut className="mr-2 h-4 w-4" />
@@ -77,7 +86,9 @@ export default function Dashboard() {
         >
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
             Welcome to Zwigatoo
-            <span className="block text-primary">{user?.role === 'staff' ? 'Staff' : 'Customer'} Dashboard</span>
+            <span className="block text-primary mt-2">
+              {user?.role === 'staff' ? 'Staff' : 'Customer'} Dashboard
+            </span>
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
             {user?.role === 'staff'
@@ -95,69 +106,53 @@ export default function Dashboard() {
         >
           {user?.role === 'staff' ? (
             <>
-              <motion.div
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
+                onClick={() => navigate("/orders")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Button
-                  onClick={() => navigate("/orders")}
-                  variant="outline"
-                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
-                >
-                  <Coffee className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">Manage Orders</h3>
-                  <p className="text-sm text-muted-foreground">View and manage customer orders</p>
-                </Button>
-              </motion.div>
-              <motion.div
+                <Coffee className="h-8 w-8 text-primary mb-3" />
+                <h3 className="font-semibold mb-2">Manage Orders</h3>
+                <p className="text-sm text-muted-foreground">View and manage customer orders</p>
+              </motion.button>
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
+                onClick={() => navigate("/menu-management")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Button
-                  onClick={() => navigate("/menu-management")}
-                  variant="outline"
-                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
-                >
-                  <Settings className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">Menu Management</h3>
-                  <p className="text-sm text-muted-foreground">Update menu items and availability</p>
-                </Button>
-              </motion.div>
+                <Settings className="h-8 w-8 text-primary mb-3" />
+                <h3 className="font-semibold mb-2">Menu Management</h3>
+                <p className="text-sm text-muted-foreground">Update menu items and availability</p>
+              </motion.button>
             </>
           ) : (
             <>
-              <motion.div
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
+                onClick={() => navigate("/menu")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Button
-                  onClick={() => navigate("/menu")}
-                  variant="outline"
-                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
-                >
-                  <Coffee className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">Browse Menu</h3>
-                  <p className="text-sm text-muted-foreground">View available items and place orders</p>
-                </Button>
-              </motion.div>
-              <motion.div
+                <Coffee className="h-8 w-8 text-primary mb-3" />
+                <h3 className="font-semibold mb-2">Browse Menu</h3>
+                <p className="text-sm text-muted-foreground">View available items and place orders</p>
+              </motion.button>
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
+                onClick={() => navigate("/orders")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Button
-                  onClick={() => navigate("/orders")}
-                  variant="outline"
-                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
-                >
-                  <Users className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">My Orders</h3>
-                  <p className="text-sm text-muted-foreground">Track your order history</p>
-                </Button>
-              </motion.div>
+                <Users className="h-8 w-8 text-primary mb-3" />
+                <h3 className="font-semibold mb-2">My Orders</h3>
+                <p className="text-sm text-muted-foreground">Track your order history</p>
+              </motion.button>
             </>
           )}
         </motion.div>
