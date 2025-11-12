@@ -45,7 +45,7 @@ export default function Landing() {
           transition={{ delay: 0.1 }}
         >
           {isAuthenticated ? (
-            <Button onClick={() => navigate("/")}>Dashboard</Button>
+            <Button onClick={() => navigate("/dashboard")}>Dashboard</Button>
           ) : (
             <Button onClick={() => navigate("/auth")}>Get Started</Button>
           )}
@@ -104,7 +104,7 @@ export default function Landing() {
         >
           <Button
             size="lg"
-            onClick={() => navigate(isAuthenticated ? "/" : "/auth")}
+            onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth")}
             className="gap-2"
           >
             {isAuthenticated ? "Go to Dashboard" : "Start Ordering"}
