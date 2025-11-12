@@ -4,6 +4,7 @@ import { InstrumentationProvider } from "@/instrumentation.tsx";
 import AuthPage from "@/pages/Auth.tsx";
 import Dashboard from "@/pages/Dashboard.tsx";
 import Menu from "@/pages/Menu.tsx";
+import MenuManagement from "@/pages/MenuManagement.tsx";
 import Orders from "@/pages/Orders.tsx";
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
@@ -50,6 +51,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/menu" element={<Menu />} />
+          <Route path="/menu-management" element={<MenuManagement />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

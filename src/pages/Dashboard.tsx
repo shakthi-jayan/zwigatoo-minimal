@@ -111,7 +111,7 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate("/menu")}
+                onClick={() => navigate("/menu-management")}
               >
                 <Settings className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-semibold mb-2">Menu Management</h3>

@@ -2,17 +2,37 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
-import { ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getMenuItems, MenuItem } from "@/firebase/firestore-service";
+import { toast } from "sonner";
 
 export default function Menu() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/auth");
+      return;
     }
+
+    const fetchMenuItems = async () => {
+      try {
+        setIsLoading(true);
+        const items = await getMenuItems();
+        setMenuItems(items);
+      } catch (error) {
+        console.error("Error fetching menu items:", error);
+        toast.error("Failed to load menu items");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMenuItems();
   }, [isAuthenticated, navigate]);
 
   if (!isAuthenticated) {
@@ -50,23 +70,76 @@ export default function Menu() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-20">
+      <div className="flex-1 flex flex-col px-4 py-12">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-center max-w-2xl"
+          className="max-w-6xl mx-auto w-full"
         >
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Menu
-            <span className="block text-primary">Coming Soon</span>
-          </h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            The menu feature is currently under development. Check back soon!
-          </p>
-          <Button onClick={() => navigate("/dashboard")} size="lg">
-            Return to Dashboard
-          </Button>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">Browse Menu</h1>
+          <p className="text-muted-foreground mb-8">Explore our delicious offerings</p>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <ShoppingCart className="h-12 w-12 text-primary" />
+              </motion.div>
+            </div>
+          ) : menuItems.length === 0 ? (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-center py-20"
+            >
+              <p className="text-lg text-muted-foreground mb-4">No menu items available yet</p>
+              <Button onClick={() => navigate("/dashboard")} variant="outline">
+                Return to Dashboard
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {menuItems.map((item, index) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 + index * 0.1 }}
+                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow"
+                >
+                  {item.image && (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-40 object-cover rounded-md mb-4"
+                    />
+                  )}
+                  <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
+                  {item.description && (
+                    <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                  )}
+                  {item.category && (
+                    <p className="text-xs text-primary mb-3">{item.category}</p>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold">₹{item.price}</span>
+                    <Button size="sm" disabled={!item.available}>
+                      {item.available ? "Add to Cart" : "Out of Stock"}
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </motion.div>
