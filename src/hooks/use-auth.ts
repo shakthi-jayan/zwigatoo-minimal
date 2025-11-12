@@ -38,25 +38,9 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async (method: string, formData: FormData) => {
-    const { sendOTPEmail, verifyOTPEmail, signInAsGuest } = await import(
-      "@/firebase/auth-service"
-    );
-
-    if (method === "email-otp") {
-      const email = formData.get("email") as string;
-      const code = formData.get("code") as string;
-
-      if (code) {
-        // Code provided, verify it
-        await verifyOTPEmail(email);
-      } else {
-        // No code, send OTP (which handles both signup and signin)
-        await sendOTPEmail(email);
-      }
-    } else if (method === "anonymous") {
-      await signInAsGuest();
-    }
+  const signIn = async () => {
+    const { signInAsGuest } = await import("@/firebase/auth-service");
+    await signInAsGuest();
   };
 
   const signOut = async () => {
