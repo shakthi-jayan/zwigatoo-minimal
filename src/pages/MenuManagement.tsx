@@ -2,17 +2,17 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom"; // Changed from "react-router" to "react-router-dom"
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createMenuItem, getMenuItems, deleteMenuItem, StoredMenuItem } from "@/lib/storage";
 import { toast } from "sonner";
 
 export default function MenuManagement() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState<StoredMenuItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingItems, setIsLoadingItems] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -24,6 +24,9 @@ export default function MenuManagement() {
   });
 
   useEffect(() => {
+    // Wait for auth to load first
+    if (isLoading) return;
+
     if (!isAuthenticated || user?.role !== "staff") {
       navigate("/dashboard");
       return;
@@ -31,19 +34,19 @@ export default function MenuManagement() {
 
     const fetchMenuItems = async () => {
       try {
-        setIsLoading(true);
+        setIsLoadingItems(true);
         const items = await getMenuItems();
         setMenuItems(items);
       } catch (error) {
         console.error("Error fetching menu items:", error);
         toast.error("Failed to load menu items");
       } finally {
-        setIsLoading(false);
+        setIsLoadingItems(false);
       }
     };
 
     fetchMenuItems();
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate, isLoading]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -104,6 +107,21 @@ export default function MenuManagement() {
     }
   };
 
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        >
+          <Coffee className="h-12 w-12 text-primary" />
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Return null if not authorized
   if (!isAuthenticated || user?.role !== "staff") {
     return null;
   }
@@ -123,7 +141,7 @@ export default function MenuManagement() {
           transition={{ delay: 0.1 }}
           className="flex items-center gap-2"
         >
-          <img src="./logo.svg" alt="Zwigatoo" width={40} height={40} className="rounded-lg" />
+          <img src="/logo.svg" alt="Zwigatoo" width={40} height={40} className="rounded-lg" />
           <span className="font-bold text-lg">Zwigatoo</span>
         </motion.div>
         <motion.div
@@ -173,6 +191,7 @@ export default function MenuManagement() {
                   value={formData.price}
                   onChange={handleInputChange}
                   step="0.01"
+                  min="0"
                   required
                 />
               </div>
@@ -204,11 +223,12 @@ export default function MenuManagement() {
                 <input
                   type="checkbox"
                   name="available"
+                  id="available"
                   checked={formData.available}
                   onChange={handleInputChange}
                   className="rounded"
                 />
-                <label className="text-sm font-medium">Available</label>
+                <label htmlFor="available" className="text-sm font-medium">Available</label>
               </div>
               <Button type="submit" disabled={isSubmitting} className="w-full">
                 <Plus className="mr-2 h-4 w-4" />
@@ -224,7 +244,7 @@ export default function MenuManagement() {
             transition={{ delay: 0.4 }}
           >
             <h2 className="text-2xl font-semibold mb-6">Current Menu Items</h2>
-            {isLoading ? (
+            {isLoadingItems ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">Loading menu items...</p>
               </div>
@@ -247,6 +267,9 @@ export default function MenuManagement() {
                         src={item.image}
                         alt={item.name}
                         className="w-full h-40 object-cover rounded-md mb-4"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
                     )}
                     <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
@@ -257,7 +280,7 @@ export default function MenuManagement() {
                       <p className="text-xs text-primary mb-2">{item.category}</p>
                     )}
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-lg font-bold">₹{item.price}</span>
+                      <span className="text-lg font-bold">₹{item.price.toFixed(2)}</span>
                       <span className={`text-xs px-2 py-1 rounded ${item.available ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                         {item.available ? "Available" : "Out of Stock"}
                       </span>
