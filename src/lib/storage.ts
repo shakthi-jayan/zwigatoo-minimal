@@ -140,6 +140,11 @@ export const getOrders = async (userId: string): Promise<StoredOrder[]> => {
   return data.orders.filter(order => order.userId === userId);
 };
 
+export const getAllOrders = async (): Promise<StoredOrder[]> => {
+  const data = getStorageData();
+  return data.orders || [];
+};
+
 export const createOrder = async (order: Omit<StoredOrder, '_id' | 'createdAt'>): Promise<StoredOrder> => {
   const data = getStorageData();
   

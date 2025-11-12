@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getOrders, StoredOrder } from "@/lib/storage";
+import { getOrders, getAllOrders, StoredOrder } from "@/lib/storage";
 import { toast } from "sonner";
 
 export default function Orders() {
@@ -26,7 +26,10 @@ export default function Orders() {
       try {
         setIsLoadingOrders(true);
         if (user?.uid) {
-          const userOrders = await getOrders(user.uid);
+          // Staff sees all orders, customers see only their own
+          const userOrders = user.role === 'staff' 
+            ? await getAllOrders() 
+            : await getOrders(user.uid);
           setOrders(userOrders);
         }
       } catch (error) {
