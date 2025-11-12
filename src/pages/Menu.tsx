@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router-dom"; // Changed from "react-router" to "react-router-dom"
+import { useNavigate } from "react-router";
 import { ArrowLeft, ShoppingCart, Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getMenuItems, StoredMenuItem, createOrder } from "@/lib/storage";
