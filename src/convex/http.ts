@@ -1,8 +1,4 @@
-import { httpRouter } from "convex/server";
-import { auth } from "./auth";
+// This file is deprecated - using Firebase Auth instead
+// Kept for reference only
 
-const http = httpRouter();
-
-auth.addHttpRoutes(http);
-
-export default http;
+export default null;

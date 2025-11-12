@@ -1,23 +1,65 @@
-import { api } from "@/convex/_generated/api";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useConvexAuth, useQuery } from "convex/react";
-
 import { useEffect, useState } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "@/firebase/config";
+import { getUser } from "@/firebase/firestore-service";
+import { signOutUser } from "@/firebase/auth-service";
+
+export interface AuthUser {
+  uid: string;
+  email?: string | null;
+  displayName?: string | null;
+  photoURL?: string | null;
+  isAnonymous: boolean;
+  role?: "admin" | "user" | "member" | "staff";
+}
 
 export function useAuth() {
-  const { isLoading: isAuthLoading, isAuthenticated } = useConvexAuth();
-  const user = useQuery(api.users.currentUser);
-  const { signIn, signOut } = useAuthActions();
-
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // This effect updates the loading state once auth is loaded and user data is available
-  // It ensures we only show content when both authentication state and user data are ready
   useEffect(() => {
-    if (!isAuthLoading && user !== undefined) {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser: User | null) => {
+      if (currentUser) {
+        const userData = await getUser(currentUser.uid);
+        setUser({
+          ...currentUser,
+          role: userData?.role,
+          isAnonymous: userData?.isAnonymous,
+        } as AuthUser);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
       setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const signIn = async (method: string, formData: FormData) => {
+    const { sendOTPEmail, verifyOTPEmail, signInAsGuest } = await import(
+      "@/firebase/auth-service"
+    );
+
+    if (method === "email-otp") {
+      const email = formData.get("email") as string;
+      const code = formData.get("code") as string;
+
+      if (code) {
+        await verifyOTPEmail(email);
+      } else {
+        await sendOTPEmail(email);
+      }
+    } else if (method === "anonymous") {
+      await signInAsGuest();
     }
-  }, [isAuthLoading, user]);
+  };
+
+  const signOut = async () => {
+    await signOutUser();
+  };
 
   return {
     isLoading,

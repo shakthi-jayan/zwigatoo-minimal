@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { ArrowRight, Loader2, Mail, UserX } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 interface AuthProps {
   redirectAfterAuth?: string;
@@ -37,22 +38,28 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       navigate(redirect);
     }
   }, [authLoading, isAuthenticated, navigate, redirectAfterAuth]);
+
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
     try {
       const formData = new FormData(event.currentTarget);
-      await signIn("email-otp", formData);
-      setStep({ email: formData.get("email") as string });
+      const email = formData.get("email") as string;
+      const fd = new FormData();
+      fd.append("email", email);
+      await signIn("email-otp", fd);
+      setStep({ email });
+      toast.success("Check your email for the verification link");
       setIsLoading(false);
     } catch (error) {
       console.error("Email sign-in error:", error);
-      setError(
+      const errorMsg =
         error instanceof Error
           ? error.message
-          : "Failed to send verification code. Please try again.",
-      );
+          : "Failed to send verification code. Please try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
       setIsLoading(false);
     }
   };
@@ -62,19 +69,20 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     setIsLoading(true);
     setError(null);
     try {
-      const formData = new FormData(event.currentTarget);
-      await signIn("email-otp", formData);
-
-      console.log("signed in");
-
-      const redirect = redirectAfterAuth || "/";
-      navigate(redirect);
+      if (typeof step === "object" && "email" in step) {
+        const fd = new FormData();
+        fd.append("email", step.email);
+        fd.append("code", otp);
+        await signIn("email-otp", fd);
+        toast.success("Signed in successfully");
+        const redirect = redirectAfterAuth || "/";
+        navigate(redirect);
+      }
     } catch (error) {
       console.error("OTP verification error:", error);
-
       setError("The verification code you entered is incorrect.");
+      toast.error("Verification failed");
       setIsLoading(false);
-
       setOtp("");
     }
   };
@@ -83,15 +91,16 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     setIsLoading(true);
     setError(null);
     try {
-      console.log("Attempting anonymous sign in...");
-      await signIn("anonymous");
-      console.log("Anonymous sign in successful");
+      const fd = new FormData();
+      await signIn("anonymous", fd);
+      toast.success("Signed in as guest");
       const redirect = redirectAfterAuth || "/";
       navigate(redirect);
     } catch (error) {
       console.error("Guest login error:", error);
-      console.error("Error details:", JSON.stringify(error, null, 2));
-      setError(`Failed to sign in as guest: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMsg = `Failed to sign in as guest: ${error instanceof Error ? error.message : "Unknown error"}`;
+      setError(errorMsg);
+      toast.error(errorMsg);
       setIsLoading(false);
     }
   };
@@ -190,9 +199,6 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
               </CardHeader>
               <form onSubmit={handleOtpSubmit}>
                 <CardContent className="pb-4">
-                  <input type="hidden" name="email" value={step.email} />
-                  <input type="hidden" name="code" value={otp} />
-
                   <div className="flex justify-center">
                     <InputOTP
                       value={otp}
