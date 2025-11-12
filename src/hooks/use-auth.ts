@@ -21,16 +21,30 @@ export function useAuth() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser: User | null) => {
       if (currentUser) {
-        const userData = await getUser(currentUser.uid);
-        setUser({
-          uid: currentUser.uid,
-          email: currentUser.email,
-          displayName: currentUser.displayName,
-          photoURL: currentUser.photoURL,
-          role: userData?.role,
-          isAnonymous: userData?.isAnonymous ?? currentUser.isAnonymous,
-        } as AuthUser);
-        setIsAuthenticated(true);
+        try {
+          const userData = await getUser(currentUser.uid);
+          setUser({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+            role: userData?.role || (currentUser.isAnonymous ? "user" : "customer"),
+            isAnonymous: userData?.isAnonymous ?? currentUser.isAnonymous,
+          } as AuthUser);
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          // Fallback to basic user data if Firestore fails
+          setUser({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+            role: currentUser.isAnonymous ? "user" : "customer",
+            isAnonymous: currentUser.isAnonymous,
+          } as AuthUser);
+          setIsAuthenticated(true);
+        }
       } else {
         setUser(null);
         setIsAuthenticated(false);
