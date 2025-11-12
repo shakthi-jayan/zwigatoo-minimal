@@ -1,19 +1,22 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom"; // Changed from "react-router" to "react-router-dom"
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getOrders, StoredOrder } from "@/lib/storage";
 import { toast } from "sonner";
 
 export default function Orders() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<StoredOrder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
 
   useEffect(() => {
+    // Wait for auth to load first
+    if (isLoading) return;
+
     if (!isAuthenticated) {
       navigate("/auth");
       return;
@@ -21,7 +24,7 @@ export default function Orders() {
 
     const fetchOrders = async () => {
       try {
-        setIsLoading(true);
+        setIsLoadingOrders(true);
         if (user?.uid) {
           const userOrders = await getOrders(user.uid);
           setOrders(userOrders);
@@ -30,25 +33,42 @@ export default function Orders() {
         console.error("Error fetching orders:", error);
         toast.error("Failed to load orders");
       } finally {
-        setIsLoading(false);
+        setIsLoadingOrders(false);
       }
     };
 
     fetchOrders();
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate, isLoading]);
 
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        >
+          <ShoppingCart className="h-12 w-12 text-primary" />
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Return null if not authenticated
   if (!isAuthenticated) {
     return null;
   }
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'completed':
         return 'bg-green-100 text-green-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -69,7 +89,7 @@ export default function Orders() {
           transition={{ delay: 0.1 }}
           className="flex items-center gap-2"
         >
-          <img src="./logo.svg" alt="Zwigatoo" width={40} height={40} className="rounded-lg" />
+          <img src="/logo.svg" alt="Zwigatoo" width={40} height={40} className="rounded-lg" />
           <span className="font-bold text-lg">Zwigatoo</span>
         </motion.div>
         <motion.div
@@ -92,10 +112,14 @@ export default function Orders() {
           transition={{ delay: 0.2 }}
           className="max-w-6xl mx-auto w-full"
         >
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">My Orders</h1>
-          <p className="text-muted-foreground mb-8">View your order history</p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">
+            {user?.role === 'staff' ? 'All Orders' : 'My Orders'}
+          </h1>
+          <p className="text-muted-foreground mb-8">
+            {user?.role === 'staff' ? 'Manage customer orders' : 'View your order history'}
+          </p>
 
-          {isLoading ? (
+          {isLoadingOrders ? (
             <div className="flex items-center justify-center py-20">
               <motion.div
                 animate={{ rotate: 360 }}
@@ -112,9 +136,11 @@ export default function Orders() {
               className="text-center py-20"
             >
               <p className="text-lg text-muted-foreground mb-4">No orders yet</p>
-              <Button onClick={() => navigate("/menu")} variant="outline">
-                Browse Menu
-              </Button>
+              {user?.role !== 'staff' && (
+                <Button onClick={() => navigate("/menu")} variant="outline">
+                  Browse Menu
+                </Button>
+              )}
             </motion.div>
           ) : (
             <motion.div
