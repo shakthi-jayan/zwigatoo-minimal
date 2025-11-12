@@ -10,7 +10,7 @@ export interface AuthUser {
   displayName?: string | null;
   photoURL?: string | null;
   isAnonymous: boolean;
-  role?: "admin" | "user" | "member" | "staff";
+  role?: "admin" | "user" | "member" | "staff" | "customer";
 }
 
 export function useAuth() {
@@ -23,9 +23,12 @@ export function useAuth() {
       if (currentUser) {
         const userData = await getUser(currentUser.uid);
         setUser({
-          ...currentUser,
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL,
           role: userData?.role,
-          isAnonymous: userData?.isAnonymous,
+          isAnonymous: userData?.isAnonymous ?? currentUser.isAnonymous,
         } as AuthUser);
         setIsAuthenticated(true);
       } else {
@@ -38,7 +41,17 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async () => {
+  const signIn = async (email: string, password: string) => {
+    const { signInWithEmail } = await import("@/firebase/auth-service");
+    await signInWithEmail(email, password);
+  };
+
+  const signUp = async (email: string, password: string, role: 'customer' | 'staff') => {
+    const { signUpWithEmail } = await import("@/firebase/auth-service");
+    await signUpWithEmail(email, password, role);
+  };
+
+  const signInGuest = async () => {
     const { signInAsGuest } = await import("@/firebase/auth-service");
     await signInAsGuest();
   };
@@ -52,6 +65,8 @@ export function useAuth() {
     isAuthenticated,
     user,
     signIn,
+    signUp,
+    signInGuest,
     signOut,
   };
 }
