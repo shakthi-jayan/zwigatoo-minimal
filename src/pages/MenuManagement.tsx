@@ -5,13 +5,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { createMenuItem, getMenuItems, deleteMenuItem, MenuItem } from "@/firebase/firestore-service";
+import { createMenuItem, getMenuItems, deleteMenuItem, StoredMenuItem } from "@/lib/storage";
 import { toast } from "sonner";
 
 export default function MenuManagement() {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<StoredMenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({

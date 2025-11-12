@@ -3,8 +3,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { auth, db } from './config';
-import { doc, setDoc } from 'firebase/firestore';
+import { auth } from './config';
+import { saveUser } from '@/lib/storage';
 
 export interface AuthUser {
   uid: string;
@@ -18,14 +18,18 @@ export interface AuthUser {
 export const signInWithGoogle = async (role: 'customer' | 'staff') => {
   const provider = new GoogleAuthProvider();
   const userCredential = await signInWithPopup(auth, provider);
-  await setDoc(doc(db, 'users', userCredential.user.uid), {
-    email: userCredential.user.email,
-    name: userCredential.user.displayName || 'User',
-    image: userCredential.user.photoURL || '',
+  
+  // Save user to local storage instead of Firestore
+  await saveUser({
+    uid: userCredential.user.uid,
+    email: userCredential.user.email || '',
+    displayName: userCredential.user.displayName || 'User',
+    photoURL: userCredential.user.photoURL || '',
     role,
     isAnonymous: false,
-    createdAt: new Date(),
-  }, { merge: true });
+    createdAt: new Date().toISOString(),
+  });
+  
   return userCredential.user;
 };
 

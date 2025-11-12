@@ -4,13 +4,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getMenuItems, MenuItem } from "@/firebase/firestore-service";
+import { getMenuItems, StoredMenuItem } from "@/lib/storage";
 import { toast } from "sonner";
 
 export default function Menu() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<StoredMenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { getUser } from "@/firebase/firestore-service";
+import { getUser } from "@/lib/storage";
 import { signOutUser } from "@/firebase/auth-service";
 
 export interface AuthUser {
@@ -33,7 +33,7 @@ export function useAuth() {
           } as AuthUser);
           setIsAuthenticated(true);
         } catch (error) {
-          // Silently handle Firestore offline errors - use default role
+          // Fallback to default role if storage fails
           setUser({
             uid: currentUser.uid,
             email: currentUser.email,
