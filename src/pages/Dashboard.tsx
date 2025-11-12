@@ -95,57 +95,53 @@ export default function Dashboard() {
         >
           {user?.role === 'staff' ? (
             <>
-              <motion.div
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => navigate("/orders")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
                 <Coffee className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-semibold mb-2">Manage Orders</h3>
                 <p className="text-sm text-muted-foreground">View and manage customer orders</p>
-              </motion.div>
-              <motion.div
+              </motion.button>
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow"
+                onClick={() => navigate("/menu-management")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <button
-                  onClick={() => navigate("/menu-management")}
-                  className="w-full h-full text-left cursor-pointer"
-                >
-                  <Settings className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-semibold mb-2">Menu Management</h3>
-                  <p className="text-sm text-muted-foreground">Update menu items and availability</p>
-                </button>
-              </motion.div>
+                <Settings className="h-8 w-8 text-primary mb-3" />
+                <h3 className="font-semibold mb-2">Menu Management</h3>
+                <p className="text-sm text-muted-foreground">Update menu items and availability</p>
+              </motion.button>
             </>
           ) : (
             <>
-              <motion.div
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => navigate("/menu")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
                 <Coffee className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-semibold mb-2">Browse Menu</h3>
                 <p className="text-sm text-muted-foreground">View available items and place orders</p>
-              </motion.div>
-              <motion.div
+              </motion.button>
+              <motion.button
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => navigate("/orders")}
+                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
                 <Users className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-semibold mb-2">My Orders</h3>
                 <p className="text-sm text-muted-foreground">Track your order history</p>
-              </motion.div>
+              </motion.button>
             </>
           )}
         </motion.div>
