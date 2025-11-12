@@ -22,9 +22,19 @@ export interface StoredMenuItem {
   createdAt: string;
 }
 
+export interface StoredOrder {
+  _id: string;
+  userId: string;
+  items: Array<{ itemId: string; itemName: string; quantity: number; price: number }>;
+  totalPrice: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  createdAt: string;
+}
+
 interface StorageData {
   users: StoredUser[];
   menuItems: StoredMenuItem[];
+  orders: StoredOrder[];
 }
 
 const STORAGE_KEY = 'zwigatoo_data';
@@ -33,6 +43,7 @@ const STORAGE_KEY = 'zwigatoo_data';
 const defaultData: StorageData = {
   users: [],
   menuItems: [],
+  orders: [],
 };
 
 // Get all storage data
@@ -112,4 +123,34 @@ export const deleteMenuItem = async (id: string): Promise<void> => {
   const data = getStorageData();
   data.menuItems = data.menuItems.filter(item => item._id !== id);
   saveStorageData(data);
+};
+
+// Order operations
+export const getOrders = async (userId: string): Promise<StoredOrder[]> => {
+  const data = getStorageData();
+  return data.orders.filter(order => order.userId === userId);
+};
+
+export const createOrder = async (order: Omit<StoredOrder, '_id' | 'createdAt'>): Promise<StoredOrder> => {
+  const data = getStorageData();
+  const newOrder: StoredOrder = {
+    ...order,
+    _id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    createdAt: new Date().toISOString(),
+  };
+  
+  data.orders.push(newOrder);
+  saveStorageData(data);
+  
+  return newOrder;
+};
+
+export const updateOrder = async (id: string, updates: Partial<StoredOrder>): Promise<void> => {
+  const data = getStorageData();
+  const index = data.orders.findIndex(order => order._id === id);
+  
+  if (index >= 0) {
+    data.orders[index] = { ...data.orders[index], ...updates };
+    saveStorageData(data);
+  }
 };
