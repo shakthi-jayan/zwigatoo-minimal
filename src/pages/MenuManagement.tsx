@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router-dom"; // Changed from "react-router" to "react-router-dom"
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router";
+import { ArrowLeft, Plus, Trash2, Coffee } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createMenuItem, getMenuItems, deleteMenuItem, StoredMenuItem } from "@/lib/storage";
 import { toast } from "sonner";

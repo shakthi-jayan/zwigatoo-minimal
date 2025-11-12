@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router-dom"; // Changed from "react-router" to "react-router-dom"
+import { useNavigate } from "react-router";
 import { LogOut, Coffee, Users, Settings } from "lucide-react";
 import { useEffect } from "react";
 
