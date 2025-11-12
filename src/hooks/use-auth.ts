@@ -28,19 +28,18 @@ export function useAuth() {
             email: currentUser.email,
             displayName: currentUser.displayName,
             photoURL: currentUser.photoURL,
-            role: userData?.role || (currentUser.isAnonymous ? "user" : "customer"),
+            role: userData?.role || "customer",
             isAnonymous: userData?.isAnonymous ?? currentUser.isAnonymous,
           } as AuthUser);
           setIsAuthenticated(true);
         } catch (error) {
-          console.error("Error fetching user data:", error);
-          // Fallback to basic user data if Firestore fails
+          // Silently handle Firestore offline errors - use default role
           setUser({
             uid: currentUser.uid,
             email: currentUser.email,
             displayName: currentUser.displayName,
             photoURL: currentUser.photoURL,
-            role: currentUser.isAnonymous ? "user" : "customer",
+            role: "customer",
             isAnonymous: currentUser.isAnonymous,
           } as AuthUser);
           setIsAuthenticated(true);
@@ -55,21 +54,6 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { signInWithEmail } = await import("@/firebase/auth-service");
-    await signInWithEmail(email, password);
-  };
-
-  const signUp = async (email: string, password: string, role: 'customer' | 'staff') => {
-    const { signUpWithEmail } = await import("@/firebase/auth-service");
-    await signUpWithEmail(email, password, role);
-  };
-
-  const signInGuest = async () => {
-    const { signInAsGuest } = await import("@/firebase/auth-service");
-    await signInAsGuest();
-  };
-
   const signOut = async () => {
     await signOutUser();
   };
@@ -78,9 +62,6 @@ export function useAuth() {
     isLoading,
     isAuthenticated,
     user,
-    signIn,
-    signUp,
-    signInGuest,
     signOut,
   };
 }
