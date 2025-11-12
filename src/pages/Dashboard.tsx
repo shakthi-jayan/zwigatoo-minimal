@@ -95,53 +95,69 @@ export default function Dashboard() {
         >
           {user?.role === 'staff' ? (
             <>
-              <motion.button
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                onClick={() => navigate("/orders")}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Coffee className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-semibold mb-2">Manage Orders</h3>
-                <p className="text-sm text-muted-foreground">View and manage customer orders</p>
-              </motion.button>
-              <motion.button
+                <Button
+                  onClick={() => navigate("/orders")}
+                  variant="outline"
+                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
+                >
+                  <Coffee className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">Manage Orders</h3>
+                  <p className="text-sm text-muted-foreground">View and manage customer orders</p>
+                </Button>
+              </motion.div>
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                onClick={() => navigate("/menu-management")}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Settings className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-semibold mb-2">Menu Management</h3>
-                <p className="text-sm text-muted-foreground">Update menu items and availability</p>
-              </motion.button>
+                <Button
+                  onClick={() => navigate("/menu-management")}
+                  variant="outline"
+                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
+                >
+                  <Settings className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">Menu Management</h3>
+                  <p className="text-sm text-muted-foreground">Update menu items and availability</p>
+                </Button>
+              </motion.div>
             </>
           ) : (
             <>
-              <motion.button
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                onClick={() => navigate("/menu")}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Coffee className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-semibold mb-2">Browse Menu</h3>
-                <p className="text-sm text-muted-foreground">View available items and place orders</p>
-              </motion.button>
-              <motion.button
+                <Button
+                  onClick={() => navigate("/menu")}
+                  variant="outline"
+                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
+                >
+                  <Coffee className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">Browse Menu</h3>
+                  <p className="text-sm text-muted-foreground">View available items and place orders</p>
+                </Button>
+              </motion.div>
+              <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                onClick={() => navigate("/orders")}
-                className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               >
-                <Users className="h-8 w-8 text-primary mb-3" />
-                <h3 className="font-semibold mb-2">My Orders</h3>
-                <p className="text-sm text-muted-foreground">Track your order history</p>
-              </motion.button>
+                <Button
+                  onClick={() => navigate("/orders")}
+                  variant="outline"
+                  className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow cursor-pointer text-left w-full h-auto flex flex-col items-start"
+                >
+                  <Users className="h-8 w-8 text-primary mb-3" />
+                  <h3 className="font-semibold mb-2">My Orders</h3>
+                  <p className="text-sm text-muted-foreground">Track your order history</p>
+                </Button>
+              </motion.div>
             </>
           )}
         </motion.div>
