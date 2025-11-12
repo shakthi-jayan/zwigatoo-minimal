@@ -50,7 +50,16 @@ const defaultData: StorageData = {
 export const getStorageData = (): StorageData => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : defaultData;
+    if (data) {
+      const parsed = JSON.parse(data);
+      // Ensure all required properties exist
+      return {
+        users: parsed.users || [],
+        menuItems: parsed.menuItems || [],
+        orders: parsed.orders || [],
+      };
+    }
+    return defaultData;
   } catch {
     return defaultData;
   }
@@ -133,6 +142,12 @@ export const getOrders = async (userId: string): Promise<StoredOrder[]> => {
 
 export const createOrder = async (order: Omit<StoredOrder, '_id' | 'createdAt'>): Promise<StoredOrder> => {
   const data = getStorageData();
+  
+  // Ensure orders array exists
+  if (!data.orders) {
+    data.orders = [];
+  }
+  
   const newOrder: StoredOrder = {
     ...order,
     _id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
