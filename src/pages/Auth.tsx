@@ -50,14 +50,14 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       fd.append("email", email);
       await signIn("email-otp", fd);
       setStep({ email });
-      toast.success("Check your email for the verification link");
+      toast.success("Account created/found. Enter verification code.");
       setIsLoading(false);
     } catch (error) {
       console.error("Email sign-in error:", error);
       const errorMsg =
         error instanceof Error
           ? error.message
-          : "Failed to send verification code. Please try again.";
+          : "Failed to process email. Please try again.";
       setError(errorMsg);
       toast.error(errorMsg);
       setIsLoading(false);

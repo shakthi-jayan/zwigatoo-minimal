@@ -48,8 +48,10 @@ export function useAuth() {
       const code = formData.get("code") as string;
 
       if (code) {
+        // Code provided, verify it
         await verifyOTPEmail(email);
       } else {
+        // No code, send OTP (which handles both signup and signin)
         await sendOTPEmail(email);
       }
     } else if (method === "anonymous") {
